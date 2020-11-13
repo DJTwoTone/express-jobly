@@ -17,20 +17,25 @@ class Company {
 
     /** find all customers */
 
-    static async getAllCompanies(data) {
+    static async getCompanies(data) {
         let baseQuery = 'SELECT handle, name FROM companies';
         let wheres = [];
         let values = [];
         const min_employees = parseInt(data.min_employees);
         const max_employees = parseInt(data.max_employees);
 
-        if (parseInt(data.min_employees) >= parseInt(data.mmax_employees)) {
+        if (parseInt(data.min_employees) >= parseInt(data.max_employees)) {
             throw new ExpressError(
                 'Minimum employees cannot be less than or even equal to maximum employees',
                 400
             )
         }
-
+        
+        if (data.search) {
+            values.push(`%${data.search}%`);
+            wheres.push(`name ILIKE $${values.length}`);
+        };
+        
         if (data.min_employees) {
             values.push(parseInt(data.min_employees));
             wheres.push(`num_employees >= $${values.length}`);
@@ -38,20 +43,15 @@ class Company {
 
         if (data.max_employees) {
             values.push(parseInt(data.max_employees));
-            wheres.push(`num_employees >= $${values.length}`);
+            wheres.push(`num_employees <= $${values.length}`);
         };
 
-        if (data.search) {
-            values.push(`%${data.search}%`);
-            wheres.push(`name ILIKE $${values.length}`);
-        };
 
-        if (wheres > 0) {
+        if (wheres.length > 0) {
             baseQuery += " WHERE ";
         }
 
-        let query = baseQuery + wheres.join(" AND ") + "ORDER BY name";
-
+        let query = baseQuery + wheres.join(" AND ") + " ORDER BY name";
         const companies = await db.query(query, values);
         return companies.rows
     }
@@ -81,7 +81,9 @@ class Company {
             return company
         }
         
-        static async create({handle, name, num_employees, description, logo_url}) {
+        static async create(data) {
+            // console.log('data --->', data)
+            const {handle, name, num_employees, description, logo_url} = data;
             const handleCheck = await db.query(
                 `SELECT handle 
                 FROM companies
@@ -91,7 +93,7 @@ class Company {
     
             if (handleCheck.rows[0]) {
                 throw new ExpressError(
-                    `${handle} is not available. Please choose a different hande.`,
+                    `${handle} is not available. Please choose a different handle.`,
                     400
                 );
             }
@@ -112,7 +114,7 @@ class Company {
         }
 
         static async update(handle, data) {
-            let { query, values } = partialUpdate(
+            let { query, values } = PartialUpdate(
             "companies", 
             data, 
             "handle", 
@@ -175,4 +177,4 @@ class Company {
 
 // This should return JSON of {message: "Company deleted"}
 
-module.exports = { Company }
+module.exports = Company;

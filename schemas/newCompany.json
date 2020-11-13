@@ -65,6 +65,16 @@
             "examples": [
                 "https://cdn.pixabay.com/photo/2014/10/22/16/39/tools-498202_1280.jpg"
             ]
+        },
+        "_token": {
+            "$id": "#/properties/token",
+            "type": "string",
+            "title": "The token schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "thisisatoken"
+            ]
         }
     },
     "additionalProperties": false

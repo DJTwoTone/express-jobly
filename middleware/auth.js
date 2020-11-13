@@ -1,12 +1,10 @@
-
-
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const ExpressError = require("../helpers/expressError")
 
 function authUser(req, res, next) {
     try {
-        const token = req.body._token || req.query._token;
+        const token = req.body._token;
 
         jwt.verify(token, SECRET_KEY);
         return next()

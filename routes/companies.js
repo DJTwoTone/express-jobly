@@ -16,8 +16,7 @@ const { authUser, authAdmin } = require('../middleware/auth')
 
 router.get("/", authUser, async function (req, res, next) {
     try {
-
-        const companies = await Company.getAllCompanies(req.query);
+        const companies = await Company.getCompanies(req.query);
         return res.json({ companies })
 
     } catch (e) {
@@ -38,7 +37,7 @@ router.get("/", authUser, async function (req, res, next) {
 // GET /companies/[handle]
 // This should return a single company found by its id.
 
-router.get("/:handle",authUser, async function (req, res, next) {
+router.get("/:handle", authUser, async function (req, res, next) {
     try {
         const handle = req.params.handle;
         const company = await Company.getCompany(handle);
@@ -54,13 +53,14 @@ router.get("/:handle",authUser, async function (req, res, next) {
 
 // This should return JSON of {company: companyData}
 
-router.post("/", authAdmin, async function (res, req, next) {
+router.post("/", authAdmin, async function (req, res, next) {
     try {
-        const validation = jsonschema.validate(req.body, newCompanySchema)
+        const validation = jsonschema.validate(req.body, newCompanySchema);
+
         if (!validation.valid) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400)
         }
-
+        // console.log('req.body --->', req.body)
         const company = await Company.create(req.body);
         return res.status(201).json({ company })
         
@@ -98,7 +98,7 @@ router.patch("/:handle", authAdmin, async function (req, res, next) {
 
 // This should return JSON of {message: "Company deleted"}
 
-router.delete("/:handle", authAdmin, async function (res, req, next) {
+router.delete("/:handle", authAdmin, async function (req, res, next) {
     try {
         await Company.remove(req.params.handle);
         return res.json({ message: `Company (${req.params.handle}) sucessfully deleted`})

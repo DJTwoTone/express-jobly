@@ -51,6 +51,16 @@
             "examples": [
                 "WIDGETCO"
             ]
+        },
+        "_token": {
+            "$id": "#/properties/token",
+            "type": "string",
+            "title": "The token schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "thisisatoken"
+            ]
         }
     },
     "additionalProperties": false
