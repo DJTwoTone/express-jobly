@@ -34,7 +34,7 @@ function checkCorrectUser(req, res, next) {
         const submittedToken = req.body._token;
 
         let token = jwt.verify(submittedToken, SECRET_KEY);
-
+        console.log(token.username, req.params)
         if (token.username === req.params.username) {
             return next()
         }

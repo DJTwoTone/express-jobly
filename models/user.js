@@ -17,6 +17,7 @@ class User {
             WHERE username = $1`, [username]
         );
 
+
         if (nameCheck.rows[0]) {
             throw new ExpressError(`Sorry, but "${username}" is already being used. Please select a different username`, 400);
         }
@@ -69,6 +70,7 @@ class User {
 
         const result = await db.query(query, values);
         const user = result.rows[0]
+        console.log(user)
 
         if (!user) {
             throw new ExpressError(`User: ${username} does not exist.`, 404)

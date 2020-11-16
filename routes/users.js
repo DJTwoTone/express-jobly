@@ -47,7 +47,7 @@ router.post('/', async function(req, res, next) {
     try {
         const validation = jsonschema.validate(req.body, newUserSchema);
 
-        if (!validation.vaild) {
+        if (!validation.valid) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400);
         }
 
@@ -74,11 +74,11 @@ router.patch('/:username', checkCorrectUser, async function (req, res, next) {
             throw new ExpressError('You may not change administrative provledges', 400)
         }
 
-        const validation = validate(req.body, updateUserSchema);
+        const validation = jsonschema.validate(req.body, updateUserSchema);
         if (!validation.valid) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400);
         }
-
+        console.log(req.params.username)
         const user = await User.update(req.params.username, req.body);
         return res.json({ user })
     } catch (e) {
