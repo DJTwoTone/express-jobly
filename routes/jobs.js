@@ -22,7 +22,7 @@ router.post('/', authAdmin, async function(req, res, next) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400)
         }
 
-        const job = Job.create(req.body);
+        const job = await Job.create(req.body);
         return res.status(201).json({ job })
     } catch (e) {
         return next(e)
@@ -53,7 +53,9 @@ router.get('/', authUser, async function(req, res, next) {
 
 router.get('/:id', authUser, async function(req, res, next) {
     try {
+        console.log(req.params.id)
         const job = await Job.getJob(req.params.id);
+        console.log(job)
         return res.json({ job })
     } catch (e) {
         return next(e)

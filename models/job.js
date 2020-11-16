@@ -25,7 +25,7 @@ class Job {
         }
 
         if (wheres.length > 0) {
-            query += " WHERE "
+            baseQuery += " WHERE "
         }
 
         let query = baseQuery + wheres.join(" AND ")
@@ -41,6 +41,8 @@ class Job {
             WHERE id = $1`, [id]
         );
 
+        console.log("results of sql", result.rows)
+
         let job = result.rows[0]
 
         if (!job) {
@@ -49,12 +51,12 @@ class Job {
 
         const company = await db.query(
             `SELECT name, num_employees, description, logo_url
-            FROM compnaies
+            FROM companies
             WHERE handle = $1`, [job.company_handle]
         )
 
         job.company = company.rows[0];
-
+        
         return job
     }
 
@@ -66,7 +68,6 @@ class Job {
             RETURNING id, title, salary, equity, company_handle`,
             [title, salary, equity, company_handle]
         );
-
         return result.rows[0]
     }
 
