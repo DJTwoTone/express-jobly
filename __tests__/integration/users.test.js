@@ -17,10 +17,8 @@ beforeEach(async function() {
             RETURNING *`,
             [hashedPassword]
         );
-        // console.log(testUser);
 
         testData.user = testUser.rows[0];
-        // console.log(testData);
 
         const responce = await request(app)
             .post('/login')
@@ -29,7 +27,6 @@ beforeEach(async function() {
                 password: 'password'
             });
             testData.user.token = responce.body.token;
-            // console.log(testData)
 
         const testCompany = await db.query(
             `INSERT INTO companies (handle, name, num_employees)
@@ -38,7 +35,6 @@ beforeEach(async function() {
         );
 
         testData.company = testCompany.rows[0];
-        // console.log(testData);
 
         const testJob = await db.query(
             `INSERT INTO jobs (title, salary, equity, company_handle)
@@ -48,7 +44,6 @@ beforeEach(async function() {
 
         testData.job = testJob.rows[0];
 
-        // console.log(testData);
         
     } catch (e) {
         console.error('beforeeach', e)
@@ -262,7 +257,6 @@ describe('test DELETE route users', async function() {
         await request(app)
         .delete(`/users/${testData.user.username}`)
         .send({ _token: testData.user.token });
-        console.log(testData)
         const responce = await request(app)
         .delete(`/users/${testData.user.username}`)
         .send({

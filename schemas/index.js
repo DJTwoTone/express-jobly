@@ -1,3 +1,5 @@
+//This will allow schemas to be accessed more easily
+
 exports.newCompanySchema = require('./newCompany.json');
 exports.updateCompanySchema = require('./updateCompany.json');
 exports.newJobSchema = require('./newJob.json');

@@ -115,7 +115,6 @@ describe("test GET route jobs", async function() {
         .send({
             _token: testData.user.token
         })
-        console.log(responce.body.jobs)
         expect(responce.body.jobs).toHaveLength(1)
         expect(responce.body.jobs[0]).toHaveProperty("company_handle");
         expect(responce.body.jobs[0]).toHaveProperty("title");
@@ -124,13 +123,11 @@ describe("test GET route jobs", async function() {
 
 describe("tests GET route /jobs/:id", async function() {
     test('gets a job by id', async function() {
-        console.log(testData)
         const responce = await request(app)
         .get(`/jobs/${testData.job.id}`)
         .send({
             _token: testData.user.token
         })
-        console.log("the id i need", responce.body.job.id)
         expect(responce.body.job).toHaveProperty("id");
         expect(responce.body.job.id).toBe(testData.job.id);
     })

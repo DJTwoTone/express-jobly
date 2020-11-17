@@ -3,10 +3,9 @@
 const express = require("express");
 const ExpressError = require("./helpers/expressError");
 
-const morgan = require("morgan");
-
 const app = express();
 
+//These are the 4 required routes for the Jobly app
 const companiesRoutes = require("./routes/companies")
 const jobsRoutes = require("./routes/jobs")
 const userRoutes = require('./routes/users')
@@ -17,6 +16,7 @@ app.use(express.json());
 // add logging system
 app.use(morgan("tiny"));
 
+//These set up the actual routes to be used
 app.use("/companies", companiesRoutes);
 app.use("/jobs", jobsRoutes);
 app.use("/users", userRoutes);

@@ -16,10 +16,8 @@ beforeEach(async function() {
             RETURNING *`,
             [hashedPassword]
         );
-        // console.log(testUser);
 
         testData.user = testUser.rows[0];
-        // console.log(testData);
 
         const responce = await request(app)
             .post('/login')
@@ -28,7 +26,6 @@ beforeEach(async function() {
                 password: 'password'
             });
             testData.user.token = responce.body.token;
-            // console.log(testData)
 
         const testCompany = await db.query(
             `INSERT INTO companies (handle, name, num_employees)
@@ -37,7 +34,6 @@ beforeEach(async function() {
         );
 
         testData.company = testCompany.rows[0];
-        // console.log(testData);
 
         const testJob = await db.query(
             `INSERT INTO jobs (title, salary, equity, company_handle)
@@ -47,7 +43,6 @@ beforeEach(async function() {
 
         testData.job = testJob.rows[0];
 
-        // console.log(testData);
         
     } catch (e) {
         console.error('beforeeach', e)
@@ -116,7 +111,6 @@ describe("test GET route companies", async function() {
         .send({
             _token: testData.user.token
         });
-        console.log(responce.body.companies)
         expect(responce.body.companies).toHaveLength(1);
         expect(responce.body.companies[0]).toHaveProperty('handle');
         expect(responce.body.companies[0].handle).toBe('ufp');
