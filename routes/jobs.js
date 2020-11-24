@@ -51,7 +51,16 @@ router.get('/', authUser, async function(req, res, next) {
 
 router.get('/:id', authUser, async function(req, res, next) {
     try {
-        const job = await Job.getJob(req.params.id);
+        const jobId = req.params.id;
+
+        const check = await Job.jobCheck(jobId);
+
+        if (!check) {
+            throw new ExpressError(`Job #${jobId} does not exist`, 404);
+        }
+
+        const job = await Job.getJob(jobId);
+        console.log(job)
         return res.json({ job })
     } catch (e) {
         return next(e)
@@ -64,10 +73,19 @@ router.get('/:id', authUser, async function(req, res, next) {
 router.patch('/:id', authAdmin, async function(req, res, next) {
     try {
 
+        const jobId = req.params.id;
+
         // disallows users from changing job ids
         if ('id' in req.body) {
             throw new ExpressError("Job ID's may not be changed.", 400);
         }
+
+        const check = await Job.jobCheck(jobId);
+
+        if (!check) {
+            throw new ExpressError(`Job #${jobId} does not exist`, 404);
+        }
+
 
         //validates info for job changes
         const validation = jsonschema.validate(req.body, updateJobSchema);
@@ -75,7 +93,7 @@ router.patch('/:id', authAdmin, async function(req, res, next) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400)
         }
 
-        const job = await Job.update(req.params.id, req.body);
+        const job = await Job.update(jobId, req.body);
         return res.json({ job })
     } catch (e) {
         return next(e)
@@ -87,7 +105,15 @@ router.patch('/:id', authAdmin, async function(req, res, next) {
 
 router.delete('/:id', authAdmin, async function (req, res, next) {
     try {
-        await Job.delete(req.params.id);
+        const jobId = req.params.id;
+
+        const check = await Job.jobCheck(jobId);
+
+        if (!check) {
+            throw new ExpressError(`Job #${jobId} does not exist`, 404);
+        }
+
+        await Job.delete(jobId);
         return res.json({ message: `Job #${req.params.id} deleted` })
     } catch (e) {
         return next(e)

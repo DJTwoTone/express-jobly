@@ -22,6 +22,17 @@ const { authUser, authAdmin } = require('../middleware/auth')
 
 router.get("/", authUser, async function (req, res, next) {
     try {
+        const min_employees = parseInt(req.query.min_employees);
+        const max_employees = parseInt(req.query.max_employees);
+
+        //throws an error if the impossible is inputted
+        if (min_employees >= max_employees) {
+            throw new ExpressError(
+                'Minimum employees cannot be less than or even equal to maximum employees',
+                400
+            );
+        };
+
         const companies = await Company.getCompanies(req.query);
         return res.json({ companies })
 
@@ -36,6 +47,12 @@ router.get("/", authUser, async function (req, res, next) {
 router.get("/:handle", authUser, async function (req, res, next) {
     try {
         const handle = req.params.handle;
+        const check = await Company.companyCheck(handle);
+        
+        if (!check) {
+            throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
+        };
+
         const company = await Company.getCompany(handle);
         
         return res.json({ company })
@@ -50,12 +67,21 @@ router.get("/:handle", authUser, async function (req, res, next) {
 router.post("/", authAdmin, async function (req, res, next) {
     try {
 
+        const handle = req.body.handle;
+        const check = await Company.companyCheck(handle);
+        
+        if (check) {
+            throw new ExpressError(`${handle} is not available. Please choose a different handle.`, 400);
+        };
+
         //validates required info for new compnaies
         const validation = jsonschema.validate(req.body, newCompanySchema);
 
         if (!validation.valid) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400)
         }
+
+
         const company = await Company.create(req.body);
         return res.status(201).json({ company })
         
@@ -70,6 +96,13 @@ router.post("/", authAdmin, async function (req, res, next) {
 
 router.patch("/:handle", authAdmin, async function (req, res, next) {
     try {
+        const handle = req.params.handle;
+
+        const check = await Company.companyCheck(handle);
+        
+        if (!check) {
+            throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
+        };
 
         //disallows user from changing company handles. If this changes it can cause many other database problems
         if ('handle' in req.body) {
@@ -82,7 +115,7 @@ router.patch("/:handle", authAdmin, async function (req, res, next) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400);
         }
         
-        const company = await Company.update(req.params.handle, req.body);
+        const company = await Company.update(handle, req.body);
         return res.json({ company })
     } catch (e) {
         return next(e)
@@ -94,6 +127,15 @@ router.patch("/:handle", authAdmin, async function (req, res, next) {
 
 router.delete("/:handle", authAdmin, async function (req, res, next) {
     try {
+
+        const handle = req.params.handle;
+
+        const check = await Company.companyCheck(handle);
+        
+        if (!check) {
+            throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
+        };
+
         await Company.remove(req.params.handle);
         return res.json({ message: `Company (${req.params.handle}) sucessfully deleted`})
     } catch (e) {

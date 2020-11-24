@@ -4,7 +4,22 @@ const db = require('../db');
 const ExpressError = require('../helpers/expressError');
 const partialUpdate = require('../helpers/partialUpdate');
 
+
 class Job {
+
+    static async jobCheck(id) {
+        const result = await db.query(
+            `SELECT *
+            FROM jobs
+            WHERE id = $1`, [id]
+        );
+
+        if (result.rows.length) {
+            return true;
+        };
+
+        return false;
+    }
 
     //creates a function to get a list of all jobs in the database
     static async getAllJobs(data) {
@@ -43,6 +58,8 @@ class Job {
         return jobs.rows;
     };
 
+
+
     //creates a function for getting a job by job id
     static async getJob(id) {
         const result = await db.query(
@@ -53,12 +70,15 @@ class Job {
 
         let job = result.rows[0];
 
-        //returns an error if there is no job with that id
-        if (!job) {
-            throw new ExpressError(`Job #${id} does not exist`, 404)
-        };
+        // //returns an error if there is no job with that id
+        // if (!job) {
+        //     throw new ExpressError(`Job #${id} does not exist`, 404)
+        // };
 
         //gets the company info for that job
+        //This could be done via a call on the company model, 
+        //but then to keep consistancy, the company model would also be calling on the jobs model
+        //that would create an infinite loop of calls 
         const company = await db.query(
             `SELECT name, num_employees, description, logo_url
             FROM companies
@@ -92,10 +112,10 @@ class Job {
         const result = await db.query(query, values);
         const job = result.rows[0];
 
-        //returns an error if the job cannot be found
-        if (!job) {
-            throw new ExpressError(`Job #${id} does not exist.`, 404)
-        };
+        // //returns an error if the job cannot be found
+        // if (!job) {
+        //     throw new ExpressError(`Job #${id} does not exist.`, 404)
+        // };
 
         return job;
     };
@@ -108,10 +128,10 @@ class Job {
             RETURNING id`, [id]
         );
 
-        //returns an error if the job cannot be found
-        if (result.rows.length === 0) {
-            throw new ExpressError(`Job #${id} does not exist.`, 404);
-        };
+        // //returns an error if the job cannot be found
+        // if (result.rows.length === 0) {
+        //     throw new ExpressError(`Job #${id} does not exist.`, 404);
+        // };
     };
 
 };

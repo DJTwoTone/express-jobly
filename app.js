@@ -14,7 +14,7 @@ const loginRoute = require('./routes/login')
 app.use(express.json());
 
 // add logging system
-app.use(morgan("tiny"));
+// app.use(morgan("tiny"));
 
 //These set up the actual routes to be used
 app.use("/companies", companiesRoutes);

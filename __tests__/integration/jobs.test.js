@@ -181,14 +181,10 @@ describe("test PATCH route /jobs/:id", async function() {
         expect(responce.statusCode).toBe(400);
     })
 
-    test("404 error is cannot find user", async function () {
-        await request(app)
-            .delete(`/jobs/${testData.job.id}`)
-            .send({
-              _token: testData.user.token
-            });
+    test("404 error is cannot find job", async function () {
+
         const response = await request(app)
-            .patch(`/jobs/${testData.job.id}`)
+            .patch(`/jobs/5678`)
             .send({
               _token: testData.user.token, 
               title: "instructor"

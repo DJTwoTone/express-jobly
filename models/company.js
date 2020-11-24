@@ -7,6 +7,20 @@ const PartialUpdate = require("../helpers/partialUpdate")
 
 class Company {
 
+    static async companyCheck(handle) {
+        const result = await db.query(
+            `SELECT *
+            FROM companies
+            WHERE handle=$1`, [handle]
+            );
+
+            if (result.rows.length) {
+                return true;
+            };
+
+            return false;
+    };
+
 
     //creates a function to get a list of all companies
     static async getCompanies(data) {
@@ -17,13 +31,13 @@ class Company {
         const min_employees = parseInt(data.min_employees);
         const max_employees = parseInt(data.max_employees);
 
-        //throws an error if the impossible is inputted
-        if (min_employees >= max_employees) {
-            throw new ExpressError(
-                'Minimum employees cannot be less than or even equal to maximum employees',
-                400
-            );
-        };
+        // //throws an error if the impossible is inputted
+        // if (min_employees >= max_employees) {
+        //     throw new ExpressError(
+        //         'Minimum employees cannot be less than or even equal to maximum employees',
+        //         400
+        //     );
+        // };
         
         //allows for searches by company name
         if (data.search) {
@@ -54,6 +68,8 @@ class Company {
         return companies.rows
     };
 
+
+    
     //creates a function for getting a company by its handle
     static async getCompany(handle) {
         const result = await db.query(
@@ -64,12 +80,15 @@ class Company {
             
             const company = result.rows[0];
             
-            //throws an error if the comapny cannot be found
-            if (!company) {
-                throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
-            };
+            // //throws an error if the comapny cannot be found
+            // if (!company) {
+            //     throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
+            // };
 
             //gets the jobs that the comapny has available
+            //This could be done via a call on the jobs model, 
+            //but then to keep consistancy, the jobs model would also be calling on the company model
+            //that would create an infinite loop of calls 
             const jobs = await db.query(
                 `SELECT id, title, salary, equity
                 FROM jobs
@@ -86,20 +105,20 @@ class Company {
         static async create(data) {
             const {handle, name, num_employees, description, logo_url} = data;
 
-            //checks to make sure a compay handle is not already being used
-            const handleCheck = await db.query(
-                `SELECT handle 
-                FROM companies
-                WHERE handle = $1`,
-                [handle]
-            );
+            // //checks to make sure a compay handle is not already being used
+            // const handleCheck = await db.query(
+            //     `SELECT handle 
+            //     FROM companies
+            //     WHERE handle = $1`,
+            //     [handle]
+            // );
     
-            if (handleCheck.rows[0]) {
-                throw new ExpressError(
-                    `${handle} is not available. Please choose a different handle.`,
-                    400
-                );
-            };
+            // if (handleCheck.rows[0]) {
+            //     throw new ExpressError(
+            //         `${handle} is not available. Please choose a different handle.`,
+            //         400
+            //     );
+            // };
             
             //inserts new companies into the database
             const result = await db.query(
@@ -121,18 +140,20 @@ class Company {
         static async update(handle, data) {
 
         //creates a query for updating the company info
-        let { query, values } = PartialUpdate("companies", data, "handle", handle);
+            let { query, values } = PartialUpdate("companies", data, "handle", handle);
 
-        const result = await db.query(query, values);
-        const company = result.rows[0];
+            const result = await db.query(query, values);
 
-        //returns an error if the company cannot be found
-        if (!company) {
-            throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
+            console.log(result)
+            const company = result.rows[0];
+
+        // //returns an error if the company cannot be found
+        //     if (!company) {
+        //         throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
+        //     };
+
+            return company;
         };
-
-        return company;
-    };
 
     //creates a function for deleting companies
     static async remove(handle) {
@@ -143,9 +164,9 @@ class Company {
         );
 
         // returns an error if the company cannot be found
-        if (result.rows.length === 0) {
-            throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
-        };
+        // if (result.rows.length === 0) {
+        //     throw new ExpressError(`A company with the handle ${handle} does not exist`, 404);
+        // };
     };
 
 };

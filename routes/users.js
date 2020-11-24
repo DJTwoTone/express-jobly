@@ -28,7 +28,15 @@ router.get('/', async function (req, res, next) {
 
 router.get('/:username', async function (req, res, next) {
     try {
-        const user = await User.getUser(req.params.username);
+        const username = req.params.username;
+
+        const check = await User.userCheck(username);
+
+        if (!check) {
+            throw new ExpressError(`User: ${username} does not exist.`, 404)
+        }
+
+        const user = await User.getUser(username);
         return res.json({ user })
     } catch (e) {
         return next(e)
@@ -40,6 +48,14 @@ router.get('/:username', async function (req, res, next) {
 
 router.post('/', async function(req, res, next) {
     try {
+        const username = req.body.username;
+
+        const check = await User.userCheck(username);
+
+        if (check) {
+            throw new ExpressError(`Sorry, but "${username}" is already being used. Please select a different username`, 400);
+        }
+
         //validates that new users have the required info
         const validation = jsonschema.validate(req.body, newUserSchema);
 
@@ -71,13 +87,20 @@ router.patch('/:username', checkCorrectUser, async function (req, res, next) {
             throw new ExpressError('You may not change administrative privledges', 400)
         }
 
+        const username = req.params.username;
+        const check = await User.userCheck(username);
+
+        if (!check) {
+            throw new ExpressError(`User: ${username} does not exist.`, 404)
+        }
+
         //validates that changes user info is correct
         const validation = jsonschema.validate(req.body, updateUserSchema);
         if (!validation.valid) {
             throw new ExpressError(validation.errors.map(e => e.stack), 400);
         }
 
-        const user = await User.update(req.params.username, req.body);
+        const user = await User.update(username, req.body);
         return res.json({ user })
     } catch (e) {
         return next(e)
@@ -90,6 +113,12 @@ router.patch('/:username', checkCorrectUser, async function (req, res, next) {
 router.delete('/:username', checkCorrectUser, async function (req, res, next) {
     try {
         const username = req.params.username;
+        const check = await User.userCheck(username);
+
+        if (!check) {
+            throw new ExpressError(`User: ${username} does not exist.`, 404)
+        }
+
         await User.delete(username);
         return res.json({ message: `User: ${username} deleted` })
     } catch (e) {
