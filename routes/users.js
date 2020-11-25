@@ -30,6 +30,7 @@ router.get('/:username', async function (req, res, next) {
     try {
         const username = req.params.username;
 
+        //checks if username exists
         const check = await User.userCheck(username);
 
         if (!check) {
@@ -50,6 +51,7 @@ router.post('/', async function(req, res, next) {
     try {
         const username = req.body.username;
 
+        //checks if username already exists
         const check = await User.userCheck(username);
 
         if (check) {
@@ -88,6 +90,8 @@ router.patch('/:username', checkCorrectUser, async function (req, res, next) {
         }
 
         const username = req.params.username;
+
+        //checks if username exists
         const check = await User.userCheck(username);
 
         if (!check) {
@@ -113,6 +117,8 @@ router.patch('/:username', checkCorrectUser, async function (req, res, next) {
 router.delete('/:username', checkCorrectUser, async function (req, res, next) {
     try {
         const username = req.params.username;
+
+        //checks if username exists
         const check = await User.userCheck(username);
 
         if (!check) {

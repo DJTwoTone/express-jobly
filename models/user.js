@@ -29,18 +29,6 @@ class User {
     static async register(data) {
         const { username, password, first_name, last_name, email, photo_url} = data;
 
-        // //checks that a user's choosen user name isn't already in use
-        // const nameCheck = await db.query(
-        //     `SELECT username
-        //     FROM users
-        //     WHERE username = $1`, [username]
-        // );
-
-
-        // if (nameCheck.rows[0]) {
-        //     throw new ExpressError(`Sorry, but "${username}" is already being used. Please select a different username`, 400);
-        // }
-
         //makes the password hash to be saved in the database rather than password itself
         const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
@@ -75,11 +63,6 @@ class User {
         )
 
         const user = result.rows[0];
-        
-
-        // if (!user) {
-        //     throw new ExpressError(`User: ${username} does not exist.`, 404)
-        // }
 
         return user;
     }
@@ -98,11 +81,6 @@ class User {
         const result = await db.query(query, values);
         const user = result.rows[0]
 
-        // //returns error for non-existant users
-        // if (!user) {
-        //     throw new ExpressError(`User: ${username} does not exist.`, 404)
-        // }
-
         //deletes sensitive info
         delete user.password;
         delete user.is_admin;
@@ -117,10 +95,6 @@ class User {
             WHERE username = $1
             RETURNING username`, [username]
         );
-
-        // if (result.rows.length === 0) {
-        //     throw new ExpressError(`User: ${username} does not exist.`, 404);
-        // }
     }
 
     //creates a function for authenticating users

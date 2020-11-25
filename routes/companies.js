@@ -47,6 +47,8 @@ router.get("/", authUser, async function (req, res, next) {
 router.get("/:handle", authUser, async function (req, res, next) {
     try {
         const handle = req.params.handle;
+        
+        //Checks if the company handle exists
         const check = await Company.companyCheck(handle);
         
         if (!check) {
@@ -68,6 +70,8 @@ router.post("/", authAdmin, async function (req, res, next) {
     try {
 
         const handle = req.body.handle;
+
+        //Checks if the company handle already exists
         const check = await Company.companyCheck(handle);
         
         if (check) {
@@ -98,6 +102,7 @@ router.patch("/:handle", authAdmin, async function (req, res, next) {
     try {
         const handle = req.params.handle;
 
+        //Checks if the company handle exists
         const check = await Company.companyCheck(handle);
         
         if (!check) {
@@ -129,7 +134,8 @@ router.delete("/:handle", authAdmin, async function (req, res, next) {
     try {
 
         const handle = req.params.handle;
-
+        
+        //Checks if the company handle exists
         const check = await Company.companyCheck(handle);
         
         if (!check) {

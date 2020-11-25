@@ -53,6 +53,7 @@ router.get('/:id', authUser, async function(req, res, next) {
     try {
         const jobId = req.params.id;
 
+        //checks if job id exists
         const check = await Job.jobCheck(jobId);
 
         if (!check) {
@@ -80,6 +81,7 @@ router.patch('/:id', authAdmin, async function(req, res, next) {
             throw new ExpressError("Job ID's may not be changed.", 400);
         }
 
+        //checks if job id exists
         const check = await Job.jobCheck(jobId);
 
         if (!check) {
@@ -107,6 +109,7 @@ router.delete('/:id', authAdmin, async function (req, res, next) {
     try {
         const jobId = req.params.id;
 
+        //checks if job id exists
         const check = await Job.jobCheck(jobId);
 
         if (!check) {
